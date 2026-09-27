@@ -1,3 +1,4 @@
+import resource
 from fastmcp import FastMCP
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -37,6 +38,18 @@ def get_news(_ctx, topic: str) -> str:
 def get_stock_price(_ctx, stock: str) -> str:
     #Get the stock price for a given stock
     return f"The stock price of {stock} is 100"
+
+@mcp.custom_route("/.well-known/oauth-protected-resource", methods=["GET", "OPTIONS"])
+def oauth_metadata(request: StarletteRequest):
+    base_url = str(request.base_url).rstrip("/")
+
+    return JSONResponse({
+        "resource": base_url,
+        "authorization_servers": [os.getenv("STYTCH_DOMAIN")],
+        "scopes_supported": ["read", "write"],
+        "bearer_methods_supported": ["body", "header"],
+    })
+
 
 
 if __name__ == "__main__":
