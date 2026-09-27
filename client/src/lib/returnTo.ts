@@ -14,9 +14,12 @@ export function consumeReturnTo(): string | null {
   return value
 }
 
-export function redirectIfReturnTo(isLoggedIn: boolean) {
+export function redirectIfReturnTo(isLoggedIn: boolean, returnTo?: string | null) {
   if (!isLoggedIn) return false
-  const returnTo = consumeReturnTo()
+  if (!returnTo) {
+    const saved = consumeReturnTo()
+    if (saved) return redirectIfReturnTo(isLoggedIn, saved)
+  }
   if (returnTo) {
     window.location.href = returnTo
     return true
