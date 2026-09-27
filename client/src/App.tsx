@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { stytchPublicToken } from './lib/stytchConfig'
+import { authorizePath, isAuthorizeRequest } from './lib/oauthParams'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { AuthenticatePage } from './pages/AuthenticatePage'
@@ -21,6 +22,22 @@ function MissingConfig() {
   )
 }
 
+/**
+ * The Stytch Authorization URL is often just the site root, so an MCP client can
+ * open this app on any path with the authorization request in the query string.
+ * Send those requests to the page that hosts the IdentityProvider, query string
+ * intact, so Stytch can read client_id, redirect_uri, state and the PKCE challenge.
+ */
+function Landing() {
+  const search = typeof window === 'undefined' ? '' : window.location.search
+
+  if (isAuthorizeRequest(search)) {
+    return <Navigate to={`${authorizePath}${search}`} replace />
+  }
+
+  return <Navigate to="/" replace />
+}
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -28,8 +45,8 @@ function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/authenticate" element={<AuthenticatePage />} />
-        <Route path="/oauth/authorize" element={<OAuthAuthorizePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path={authorizePath} element={<OAuthAuthorizePage />} />
+        <Route path="*" element={<Landing />} />
       </Routes>
     </BrowserRouter>
   )

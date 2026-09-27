@@ -22,7 +22,7 @@ auth = JWTVerifier(
     algorithm="RS256",
     # Makes the 401 challenge advertise the Protected Resource Metadata URL
     # (RFC 9728 section 5.1) instead of a bare "Bearer".
-
+    base_url=PUBLIC_URL,
 )
 
 mcp = FastMCP(name="MCP Application", version="1.0.0", auth=auth)
@@ -54,8 +54,7 @@ def protected_resource_metadata(request: StarletteRequest) -> JSONResponse:
     })
 
 
-# Clients resolve the PRM URL advertised in the WWW-Authenticate challenge first, which
-# is the path-inserted form (RFC 9728 section 3.1). Serve both that URL and the root one.
+
 @mcp.custom_route("/.well-known/oauth-protected-resource", methods=["GET", "OPTIONS"])
 def oauth_metadata(request: StarletteRequest):
     return protected_resource_metadata(request)

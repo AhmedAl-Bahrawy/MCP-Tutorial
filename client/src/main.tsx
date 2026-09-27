@@ -1,34 +1,24 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { StytchB2BProvider } from '@stytch/react/b2b'
 import { StytchProvider } from '@stytch/react'
 import './index.css'
 import App from './App.tsx'
-import { isB2B, stytchPublicToken } from './lib/stytchConfig'
-import { stytchB2BClient } from './stytch/b2bClient'
-import { stytchConsumerClient } from './stytch/consumerClient'
+import { stytchPublicToken } from './lib/stytchConfig'
+import { stytchClient } from './stytch/client'
 
-const root = createRoot(document.getElementById('root')!)
-
-function Root() {
+export function Root() {
   if (!stytchPublicToken) {
     return <App />
   }
 
-  if (isB2B) {
-    return (
-      <StytchB2BProvider stytch={stytchB2BClient}>
-        <App />
-      </StytchB2BProvider>
-    )
-  }
-
   return (
-    <StytchProvider stytch={stytchConsumerClient}>
+    <StytchProvider stytch={stytchClient}>
       <App />
     </StytchProvider>
   )
 }
+
+const root = createRoot(document.getElementById('root')!)
 
 root.render(
   <StrictMode>
